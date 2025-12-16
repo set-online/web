@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="eu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SET sarea — Europa Hegoaldeko turistifikazioaren aurkako hirien sarea</title>
+  <meta name="description" content="SET sarea: Europa Hegoaldeko turistifikazioaren aurkako kolektibo, elkarte eta gizarte-mugimenduen sarea. Informazioa eta egitura: euskarazko Wikipediatik abiatuta." />
+
+  <!-- Fonts (optional, falls back to system fonts if blocked) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --set-yellow: #F3E400;
+      --set-black: #0B0B0D;
+      --ink: #111114;
+      --muted: rgba(17,17,20,.72);
+      --line: rgba(17,17,20,.14);
+      --card: rgba(255,255,255,.78);
+      --card-strong: rgba(255,255,255,.92);
+      --shadow: 0 18px 60px rgba(0,0,0,.16);
+      --shadow-soft: 0 10px 30px rgba(0,0,0,.10);
+      --radius-xl: 28px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --max: 1100px;
+    }
+
+    *{ box-sizing: border-box; }
+    html{ scroll-behavior: smooth; }
+    body{
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 600px at 15% 10%, rgba(255,255,255,.65), rgba(255,255,255,0)),
+        linear-gradient(0deg, rgba(255,255,255,1), rgba(255,255,255,1));
+    }
+
+    /* Top warning stripe (SET-style) */
+    .stripe{
+      background: var(--set-yellow);
+      border-bottom: 1px solid rgba(0,0,0,.08);
+      color: var(--set-black);
+      font-weight: 700;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+    .stripe .inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .stripe a{
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0,0,0,.35);
+    }
+
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(255,255,255,.78);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .brand{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 220px;
+    }
+    .brand-badge{
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--set-yellow);
+      border: 1px solid rgba(0,0,0,.08);
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+    .brand-badge svg{ width: 30px; height: 30px; }
+    .brand-title{
+      line-height: 1.05;
+    }
+    .brand-title strong{
+      display: block;
+      font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+      font-size: 16px;
+      letter-spacing: .01em;
+    }
+    .brand-title span{
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .menu{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .menu a{
+      text-decoration: none;
+      color: rgba(17,17,20,.9);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+    .menu a:hover{
+      background: rgba(243,228,0,.22);
+      border-color: rgba(0,0,0,.08);
+    }
+
+    .menu .cta{
+      background: var(--set-black);
+      color: white;
+      border-color: rgba(0,0,0,.12);
+      box-shadow: var(--shadow-soft);
+    }
+    .menu .cta:hover{
+      background: #000;
+      color: white;
+    }
+
+    .hamburger{
+      display: none;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.85);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Hero */
+    .hero{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 34px 18px 22px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .hero-left{
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.10);
+      background:
+        linear-gradient(135deg, rgba(243,228,0,1), rgba(243,228,0,.86)),
+        radial-gradient(900px 500px at 80% 20%, rgba(0,0,0,.14), rgba(0,0,0,0));
+      min-height: 360px;
+    }
+    .hero-left:before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(850px 460px at 30% 40%, rgba(255,255,255,.45), rgba(255,255,255,0)),
+        linear-gradient(0deg, rgba(0,0,0,.08), rgba(0,0,0,0));
+      pointer-events:none;
+    }
+    .hero-left .content{
+      position: relative;
+      padding: 30px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .kicker{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12px;
+      color: rgba(0,0,0,.86);
+    }
+    .kicker .dot{
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      background: var(--set-black);
+      box-shadow: 0 6px 18px rgba(0,0,0,.28);
+    }
+    h1{
+      margin: 0;
+      font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.03;
+      font-size: clamp(32px, 4vw, 52px);
+      color: #070708;
+    }
+    .lead{
+      margin: 0;
+      max-width: 62ch;
+      font-size: 16px;
+      line-height: 1.55;
+      color: rgba(0,0,0,.82);
+      font-weight: 600;
+    }
+    .hero-actions{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.12);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: .01em;
+    }
+    .btn.primary{
+      background: var(--set-black);
+      color: white;
+      box-shadow: var(--shadow-soft);
+    }
+    .btn.primary:hover{ background:#000; }
+    .btn.ghost{
+      background: rgba(255,255,255,.75);
+      color: var(--set-black);
+    }
+    .btn.ghost:hover{ background: rgba(255,255,255,.92); }
+
+    .hero-right{
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 18px;
+    }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+    .card .pad{ padding: 18px; }
+    .card h2{
+      margin: 0 0 8px;
+      font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+      font-size: 16px;
+      letter-spacing: -.01em;
+    }
+    .card p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .logo-panel{
+      background: rgba(255,255,255,.86);
+      display: grid;
+      grid-template-columns: 1fr;
+      place-items: center;
+      position: relative;
+    }
+    .logo-panel img{
+      width: min(240px, 92%);
+      height: auto;
+      filter: drop-shadow(0 12px 20px rgba(0,0,0,.14));
+      transform: rotate(-1deg);
+    }
+    .logo-caption{
+      margin-top: 10px;
+      padding: 0 18px 18px;
+      color: rgba(17,17,20,.72);
+      font-weight: 700;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .photo-panel{
+      position: relative;
+      min-height: 170px;
+      background: #111;
+    }
+    .photo-panel img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: contrast(1.02) saturate(1.06);
+    }
+    .photo-panel .tag{
+      position: absolute;
+      left: 14px; bottom: 14px;
+      background: rgba(0,0,0,.82);
+      color: white;
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .02em;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Sections */
+    main{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 8px 18px 58px;
+    }
+    .section{
+      margin-top: 20px;
+      padding: 22px;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      box-shadow: var(--shadow-soft);
+    }
+    .section-head{
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .section-head h3{
+      margin: 0;
+      font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+      font-size: 20px;
+      letter-spacing: -.01em;
+    }
+    .section-head .meta{
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .grid{
+      display: grid;
+      gap: 14px;
+    }
+    .grid.two{ grid-template-columns: 1fr 1fr; }
+    .grid.three{ grid-template-columns: repeat(3, 1fr); }
+
+    .pill{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(243,228,0,.18);
+      font-weight: 800;
+      font-size: 13px;
+      color: rgba(0,0,0,.86);
+    }
+    .pill .mini{
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      background: var(--set-black);
+    }
+
+    .list{
+      margin: 0;
+      padding-left: 18px;
+      color: rgba(17,17,20,.82);
+      line-height: 1.7;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .node{
+      background: var(--card-strong);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: 0 12px 26px rgba(0,0,0,.07);
+    }
+    .node strong{
+      display: block;
+      font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+      letter-spacing: -.01em;
+      margin-bottom: 6px;
+    }
+    .node a{
+      color: rgba(17,17,20,.82);
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(17,17,20,.22);
+    }
+    .node a:hover{ border-bottom-color: rgba(17,17,20,.55); }
+
+    .timeline{
+      display: grid;
+      gap: 12px;
+    }
+    .t-item{
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 12px;
+      align-items: start;
+      background: rgba(255,255,255,.88);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+    }
+    .t-item .when{
+      font-weight: 900;
+      color: var(--set-black);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: 12px;
+      padding-top: 3px;
+    }
+    .t-item .what{
+      color: rgba(17,17,20,.84);
+      font-weight: 650;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .poster{
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #111;
+      box-shadow: var(--shadow-soft);
+    }
+    .poster img{
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .refs{
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+    }
+    .refs li{
+      background: rgba(255,255,255,.88);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 650;
+      color: rgba(17,17,20,.82);
+      line-height: 1.55;
+    }
+    .refs a{
+      color: rgba(17,17,20,.88);
+      font-weight: 800;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(17,17,20,.22);
+    }
+    .refs a:hover{ border-bottom-color: rgba(17,17,20,.55); }
+
+    footer{
+      margin-top: 20px;
+      padding: 26px 18px 34px;
+      border-top: 1px solid var(--line);
+      background: rgba(243,228,0,.12);
+    }
+    footer .inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      display: grid;
+      gap: 10px;
+      color: rgba(17,17,20,.78);
+      font-weight: 650;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+    footer a{
+      color: rgba(17,17,20,.9);
+      font-weight: 850;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(17,17,20,.25);
+    }
+    footer a:hover{ border-bottom-color: rgba(17,17,20,.6); }
+
+    /* Responsive */
+    @media (max-width: 940px){
+      .hero{ grid-template-columns: 1fr; }
+      .hero-right{ grid-template-rows: auto; grid-template-columns: 1fr; }
+      .grid.three{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 720px){
+      .menu{ display: none; }
+      .hamburger{ display: inline-flex; }
+      .menu.open{
+        display: flex;
+        width: 100%;
+        justify-content: flex-start;
+        padding-top: 8px;
+      }
+      .nav{ flex-wrap: wrap; }
+      .grid.two{ grid-template-columns: 1fr; }
+      .grid.three{ grid-template-columns: 1fr; }
+      .t-item{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stripe" role="banner">
+    <div class="inner">
+      <div>Turistifikazioaren aurrean, <strong>hirien sarea</strong>.</div>
+      <div><a href="#erreferentziak">Iturriak &amp; atribuzioa</a></div>
+    </div>
+  </div>
+
+  <header>
+    <nav class="nav" aria-label="Nabigazioa">
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true">
+          <!-- Minimal “SET-style” line mark -->
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M6 7c0-2 2-3 4-3s4 1 4 3-2 3-4 3-4 1-4 3 2 3 4 3 4-1 4-3" stroke="#0B0B0D" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <strong>SET sarea</strong>
+          <span>Europa Hegoaldeko turistifikazioaren aurkako sare herritarra</span>
+        </div>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-expanded="false" aria-controls="menu">MENU</button>
+
+      <div class="menu" id="menu">
+        <a href="#zer-da">Zer da</a>
+        <a href="#nodoak">Nodoak</a>
+        <a href="#aldarrikapenak">Aldarrikapenak</a>
+        <a href="#jarduera">Jarduera</a>
+        <a href="#garaiak">Garaiak</a>
+        <a class="cta" href="#topaketak">Topaketak</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero" aria-label="Azaleko atala">
+    <div class="hero-left">
+      <div class="content">
+        <div>
+          <div class="kicker"><span class="dot"></span> Sud d’Europa contra la Turistificació</div>
+          <h1>Turistifikazioaren aurrean dauden hirien sarea</h1>
+          <p class="lead">
+            SET sarea 2018tik aktibo dagoen kolektibo, elkarte eta gizarte-mugimenduen elkargunea da:
+            turistifikazioaren ondorio kaltegarriak salatu eta alternatibak elkarrekin eraikitzeko.
+          </p>
+        </div>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="#zer-da">Hasi irakurtzen</a>
+          <a class="btn ghost" href="https://eu.wikipedia.org/wiki/SET_sarea" target="_blank" rel="noreferrer">Ikusi Wikipedian</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="card logo-panel">
+        <div class="pad" style="padding-bottom: 8px;">
+          <h2>Ikur grafikoa</h2>
+          <p>Horia + beltza, lerro garbiak eta mezu zuzenak: SETen estetika eta tonu publikoa.</p>
+        </div>
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/SET_logo_%28Basque%29.png/250px-SET_logo_%28Basque%29.png"
+          alt="SET sarearen logoa (Basque)"
+          loading="lazy"
+        />
+        <div class="logo-caption">Logoaren irudia: Wikimedia Commons / Wikipedia</div>
+      </div>
+
+      <div class="card photo-panel" aria-label="Manifestazioaren argazkia">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Donostia-Bizilagunekin-SET-Demonstration.jpg/800px-Donostia-Bizilagunekin-SET-Demonstration.jpg"
+          alt="Turistifikazioaren aurkako manifestazioa Donostian (2025)"
+          loading="lazy"
+        />
+        <div class="tag">Mobilizazioak • ekintza koordinatua</div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <section class="section" id="zer-da">
+      <div class="section-head">
+        <h3>Zer da SET sarea?</h3>
+        <div class="meta">Oinarri informatiboa: euskarazko Wikipedia (birformulatua)</div>
+      </div>
+
+      <div class="grid two">
+        <div>
+          <div class="pill"><span class="mini"></span> Helburua</div>
+          <p style="margin:10px 0 0; color: rgba(17,17,20,.84); font-weight: 650; line-height: 1.7;">
+            Europa Hegoaldeko hiri eta lurraldeetan turistifikazioak sortzen dituen ondorioak ikusgai egitea,
+            eta horien aurrean jardutea: ekintza koordinatuak, proposamen politikoak eta sentsibilizazio-kanpainak
+            uztartuz.
+          </p>
+        </div>
+        <div>
+          <div class="pill"><span class="mini"></span> Sorrera</div>
+          <p style="margin:10px 0 0; color: rgba(17,17,20,.84); font-weight: 650; line-height: 1.7;">
+            Sareak 2018ko apirilaren 24an egin zuen aurkezpena, aurretik egindako bilera eta harremanen ondorioz
+            sortutako manifestu baten bueltan.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="nodoak">
+      <div class="section-head">
+        <h3>Kideak eta nodoak</h3>
+        <div class="meta">Adibide gisa: 2025eko udaberrian aktibo aipatutako nodo nagusiak</div>
+      </div>
+
+      <div class="grid three">
+        <div class="node"><strong>Bartzelona</strong><a target="_blank" rel="noreferrer" href="https://assembleabarris.wordpress.com/">Assemblea de Barris pel Decreixement Turístic</a></div>
+        <div class="node"><strong>Donostia</strong><a target="_blank" rel="noreferrer" href="https://bizilagunekin.eus/">Bizilagunekin</a></div>
+        <div class="node"><strong>Lisboa</strong><a target="_blank" rel="noreferrer" href="https://moraremlisboa.org/">Morar em Lisboa</a></div>
+
+        <div class="node"><strong>Kantabria</strong><a target="_blank" rel="noreferrer" href="https://cantabrianosevende.org/">Cantabria No Se Vende</a></div>
+        <div class="node"><strong>Mallorca</strong><a target="_blank" rel="noreferrer" href="https://menysturisme.wordpress.com/">Menys Turisme, Més Vida</a></div>
+        <div class="node"><strong>Venezia</strong><a target="_blank" rel="noreferrer" href="https://ocio-venezia.it/">Ocio</a></div>
+      </div>
+
+      <p style="margin: 14px 0 0; color: var(--muted); font-weight: 650; line-height: 1.6;">
+        Oharra: nodoen zerrenda aldakorra da; taldeak gehitu edo urrundu egin daitezke urteek aurrera egin ahala.
+      </p>
+    </section>
+
+    <section class="section" id="aldarrikapenak">
+      <div class="section-head">
+        <h3>Ideiak eta aldarrikapen nagusiak</h3>
+        <div class="meta">Laburpena (eus.wiki edukia oinarri)</div>
+      </div>
+
+      <ul class="list">
+        <li><strong>Turistifikazioaren kritika:</strong> auzoak “merkantzia” bihurtzea, desjabetze sozialak, eta prezioen presioa salatzea.</li>
+        <li><strong>Hiriaren eta etxebizitzaren eskubidea:</strong> espekulazioaren eta alokairu turistikoaren erregulazioaren beharra azpimarratzea.</li>
+        <li><strong>Ekonomia dibertsifikatua:</strong> turismo-monokultiboaren mendekotasunetik harago, tokiko beharrei erantzuten dieten ereduak.</li>
+        <li><strong>Justizia soziala eta ingurumenekoa:</strong> inpaktu ekologikoak eta krisi klimatikoa kontuan hartuta, babes- eta erresilientzia-politikak.</li>
+        <li><strong>Autoantolaketa eta elkartasuna:</strong> hirien arteko sare-lana, esperientzien trukea eta tokiko komunitateen ahalduntzea.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="jarduera">
+      <div class="section-head">
+        <h3>Jarduera eta ekintza moduak</h3>
+        <div class="meta">Hiru ardatz nagusi</div>
+      </div>
+
+      <div class="grid three">
+        <div class="node">
+          <strong>Hausnarketa + komunikazioa</strong>
+          <p style="margin:0; color: var(--muted); font-weight: 650; line-height: 1.65; font-size: 13px;">
+            Mezu bateratuak, analisiak eta kanpainak, ikusgarritasuna eta presioa indartzeko.
+          </p>
+        </div>
+        <div class="node">
+          <strong>Mobilizazio koordinatua</strong>
+          <p style="margin:0; color: var(--muted); font-weight: 650; line-height: 1.65; font-size: 13px;">
+            Hiri eta lurralde askotan aldi berean antolatutako ekintzak, oihartzun kolektiboa sortzeko.
+          </p>
+        </div>
+        <div class="node">
+          <strong>Trukerako topaketak</strong>
+          <p style="margin:0; color: var(--muted); font-weight: 650; line-height: 1.65; font-size: 13px;">
+            Presentzialki (eta sarean) esperientziak partekatzeko, tresnak fintzeko eta aliantzak sendotzeko.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="garaiak">
+      <div class="section-head">
+        <h3>Garai nagusiak</h3>
+        <div class="meta">Hiru une azpimarragarri</div>
+      </div>
+
+      <div class="timeline">
+        <div class="t-item">
+          <div class="when">2017–2018</div>
+          <div class="what">
+            Turistifikazioaren gorakadaren aurrean, Europa Hegoaldeko hainbat tokitan plataforma eta elkarteak sortu,
+            harremanak ehundu, eta sarearen oinarriak jarri ziren.
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="when">2020–2021</div>
+          <div class="what">
+            COVID-19aren testuinguruan turismoaren menpeko ereduaren ahuleziak agerian geratu ziren, eta sareak
+            norabide-aldaketa eta ongizatea lehenesteko premia nabarmendu zuen.
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="when">2024–2025</div>
+          <div class="what">
+            Mobilizazioen igoera nabarmena: hainbat lurraldetan protestak eta ekintza bateratuak ugaritu ziren, eta 2025ean
+            berriz indartu zen jarduera koordinatua (topaketa presentzialak eta ekainaren 15eko mobilizazioak).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="topaketak">
+      <div class="section-head">
+        <h3>Topaketa presentzialak</h3>
+        <div class="meta">Aipatutako zenbait mugarri</div>
+      </div>
+
+      <div class="grid two" style="align-items: start;">
+        <div>
+          <ul class="list">
+            <li><strong>2018 (maiatzak 18–19), Bartzelona:</strong> lehen topaketetako bat (auzo-foruma).</li>
+            <li><strong>2018 (urria), Napoli:</strong> Italiako nodoen topaketa.</li>
+            <li><strong>2019 (martxoak 1–3), Florentzia:</strong> RE-SET topaketa.</li>
+            <li><strong>2019 (apirilak 2–7), Sevilla:</strong> ESTAR gizarte-topaketa (SET sarearen bigarren topaketa barne).</li>
+            <li><strong>2025 (apirilak 25–27), Bartzelona:</strong> SET topaketa.</li>
+          </ul>
+
+          <div style="margin-top: 14px;">
+            <div class="pill"><span class="mini"></span> Irailaren 27a</div>
+            <p style="margin:10px 0 0; color: rgba(17,17,20,.84); font-weight: 650; line-height: 1.7;">
+              “Turismoaren Mundu Eguna” (NBEren arabera) askotan turistifikazioaren aurkako jardunaldira birbideratu izan da,
+              mobilizazio eta komunikazio bateratuak egiteko.
+            </p>
+          </div>
+        </div>
+
+        <div class="poster" aria-label="Kartel irudia">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Cartell-cimera.webp/900px-Cartell-cimera.webp.png"
+            alt="Trobada Sud d’Europa contra la Turistització 2025 (kartela)"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="erreferentziak">
+      <div class="section-head">
+        <h3>Erreferentziak eta atribuzioa</h3>
+        <div class="meta">CC BY-SA logikarekin</div>
+      </div>
+
+      <ul class="refs">
+        <li>
+          Edukia (testuaren egitura eta datu nagusiak) oinarrituta:
+          <a href="https://eu.wikipedia.org/wiki/SET_sarea" target="_blank" rel="noreferrer">SET sarea — euskarazko Wikipedia</a>.
+        </li>
+        <li>
+          Logoaren irudia:
+          <a href="https://upload.wikimedia.org/wikipedia/commons/4/4e/SET_logo_%28Basque%29.png" target="_blank" rel="noreferrer">
+            Wikimedia Commons (SET_logo (Basque).png)
+          </a>.
+        </li>
+        <li>
+          Manifestazioaren argazkia:
+          <a href="https://commons.wikimedia.org/wiki/File:Donostia-Bizilagunekin-SET-Demonstration.jpg" target="_blank" rel="noreferrer">
+            Wikimedia Commons (Donostia-Bizilagunekin-SET-Demonstration.jpg)
+          </a>.
+        </li>
+        <li>
+          Kartelaren irudia:
+          <a href="https://commons.wikimedia.org/wiki/File:Cartell-cimera.webp" target="_blank" rel="noreferrer">
+            Wikimedia Commons (Cartell-cimera.webp)
+          </a>.
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="inner">
+      <div>
+        <strong>Ohar legala / atribuzioa:</strong> Orrialde hau diseinu-adierazpen bat da (ez webgune ofiziala).
+        Testuaren informazio-oinarria <a href="https://eu.wikipedia.org/wiki/SET_sarea" target="_blank" rel="noreferrer">euskarazko Wikipediako “SET sarea” artikulutik</a> abiatuta egin da (birformulatua).
+      </div>
+      <div>
+        Wikipediako edukia normalean <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">CC BY-SA 4.0</a> lizentzian dago (xehetasunak Wikipedian).
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    const btn = document.getElementById('hamburger');
+    const menu = document.getElementById('menu');
+
+    btn?.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+
+    // Close menu after clicking a link on mobile
+    menu?.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        if (menu.classList.contains('open')) {
+          menu.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
