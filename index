@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+  <meta charset="UTF-8">
+  <title>Erakundearen izena</title>
+</head>
+<body>
+  <h1>Erakundearen izena</h1>
+  <p>Hau da erakundearen oinarrizko informazioa.</p>
+
+  <nav>
+    <a href="eu/index.html">Euskara</a> |
+    <a href="es/index.html">Castellano</a> |
+    <a href="en/index.html">English</a>
+  </nav>
+</body>
+</html>
