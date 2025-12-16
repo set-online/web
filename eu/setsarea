@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="eu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SET sarea — Europa Hegoaldeko turistifikazioaren aurkako hirien sarea</title>
+
+  <!-- Tipografia sendoa + tonu “politikoa”: Inter (gorputza) + Space Grotesk (tituluak) + IBM Plex Mono (label/kicker) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <style>
+    :root{
+      --set-yellow:#F3E400;
+      --set-black:#0B0B0D;
+      --ink:#111114;
+      --muted:rgba(17,17,20,.72);
+      --line:rgba(17,17,20,.14);
+      --line-strong:rgba(17,17,20,.22);
+      --bg:#FAFAFA;
+
+      --radius-xl:24px;
+      --radius-lg:16px;
+      --radius-md:12px;
+
+      --max:1100px;
+      --gutter:18px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,sans-serif;
+      color:var(--ink);
+      background:var(--bg);
+    }
+
+    /* Grid zorrotza: 12 zutabe (kontainerrean) */
+    .container{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:0 var(--gutter);
+    }
+    .grid12{
+      display:grid;
+      grid-template-columns:repeat(12,minmax(0,1fr));
+      gap:14px;
+    }
+    .span-12{grid-column:span 12}
+    .span-7{grid-column:span 7}
+    .span-5{grid-column:span 5}
+
+    /* Stripe + header */
+    .stripe{
+      background:var(--set-yellow);
+      border-bottom:1px solid rgba(0,0,0,.10);
+    }
+    .stripe .container{
+      padding-top:10px;
+      padding-bottom:10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .stripe .tag{
+      font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-weight:700;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--set-black);
+    }
+    .stripe a{
+      color:var(--set-black);
+      text-decoration:none;
+      border-bottom:1px solid rgba(0,0,0,.35);
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.02em;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:rgba(250,250,250,.92);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px 0;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:220px;
+    }
+    .badge{
+      width:42px;height:42px;
+      border-radius:14px;
+      background:var(--set-yellow);
+      border:1px solid rgba(0,0,0,.10);
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      color:var(--set-black);
+      box-shadow:0 10px 22px rgba(0,0,0,.10);
+    }
+    .brand-title strong{
+      display:block;
+      font-family:"Space Grotesk",Inter,sans-serif;
+      font-weight:700;
+      letter-spacing:-.01em;
+    }
+    .brand-title span{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .menu{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:flex-end;
+    }
+    .menu a{
+      text-decoration:none;
+      color:var(--ink);
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.02em;
+      text-transform:uppercase;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid transparent;
+    }
+    .menu a:hover{
+      background:rgba(243,228,0,.20);
+      border-color:rgba(0,0,0,.10);
+    }
+
+    /* Hero */
+    .hero{ padding:26px 0 10px; }
+    .heroCard{
+      background:linear-gradient(135deg,var(--set-yellow),#f7ee7a);
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:var(--radius-xl);
+      padding:26px;
+      position:relative;
+      overflow:hidden;
+    }
+    .heroCard:before{
+      content:"";
+      position:absolute; inset:-40px;
+      background:radial-gradient(800px 420px at 70% 30%, rgba(0,0,0,.10), rgba(0,0,0,0));
+      pointer-events:none;
+    }
+
+    .kicker{
+      position:relative;
+      font-family:"IBM Plex Mono", ui-monospace, monospace;
+      font-weight:700;
+      font-size:12px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      color:rgba(0,0,0,.85);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .kicker .dot{
+      width:10px;height:10px;border-radius:999px;
+      background:var(--set-black);
+      box-shadow:0 6px 16px rgba(0,0,0,.18);
+    }
+
+    h1{
+      position:relative;
+      margin:14px 0 10px;
+      font-family:"Space Grotesk",Inter,sans-serif;
+      font-weight:700;
+      font-size:clamp(30px,4vw,52px);
+      line-height:1.03;
+      letter-spacing:-.02em;
+      color:#070708;
+    }
+    .lead{
+      position:relative;
+      margin:0;
+      font-size:16px;
+      line-height:1.65;
+      font-weight:700;
+      color:rgba(0,0,0,.82);
+      max-width:62ch;
+    }
+
+    .actions{
+      position:relative;
+      margin-top:18px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.14);
+      text-decoration:none;
+      font-family:"IBM Plex Mono", ui-monospace, monospace;
+      font-weight:700;
+      font-size:12px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      transition: transform .12s ease;
+    }
+    .btn.primary{ background:var(--set-black); color:#fff; }
+    .btn.ghost{ background:rgba(255,255,255,.90); color:var(--set-black); }
+    .btn:hover{ transform:translateY(-1px); }
+
+    .heroSide{
+      border-radius:var(--radius-xl);
+      overflow:hidden;
+      border:1px solid var(--line);
+      background:#fff;
+    }
+    .heroSide img{ width:100%; display:block; }
+    .heroSide .cap{
+      padding:12px 14px;
+      border-top:1px solid var(--line);
+      font-family:"IBM Plex Mono", ui-monospace, monospace;
+      font-size:11px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    /* Sections */
+    main{ padding:10px 0 60px; }
+    .section{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:var(--radius-xl);
+      padding:22px;
+    }
+    .sectionHead{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      padding-bottom:12px;
+      border-bottom:1px solid var(--line);
+      margin-bottom:14px;
+    }
+    .sectionHead h2{
+      margin:0;
+      font-family:"Space Grotesk",Inter,sans-serif;
+      font-size:18px;
+      letter-spacing:-.01em;
+    }
+    .meta{
+      font-family:"IBM Plex Mono", ui-monospace, monospace;
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:700;
+    }
+    .section p{
+      margin:0;
+      color:rgba(17,17,20,.85);
+      line-height:1.75;
+      font-weight:650;
+      font-size:14px;
+    }
+    .section a{
+      color:rgba(17,17,20,.92);
+      font-weight:900;
+      text-decoration:none;
+      border-bottom:1px solid rgba(17,17,20,.25);
+    }
+    .section a:hover{ border-bottom-color: rgba(17,17,20,.65); }
+
+    /* Lists */
+    .bullets{
+      margin:12px 0 0;
+      padding-left:18px;
+      color:rgba(17,17,20,.88);
+      line-height:1.75;
+      font-weight:650;
+      font-size:14px;
+    }
+    .bullets li{ margin:10px 0; }
+    .bullets strong{ font-weight:900; }
+
+    /* Timeline */
+    .timeline{
+      margin-top:14px;
+      display:grid;
+      gap:12px;
+    }
+    .tItem{
+      display:grid;
+      grid-template-columns: 140px 1fr;
+      gap:12px;
+      align-items:start;
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      background:#fafafa;
+      padding:14px;
+    }
+    .tBadge{
+      font-family:"IBM Plex Mono", ui-monospace, monospace;
+      font-weight:900;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      background:var(--set-yellow);
+      color:var(--set-black);
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:999px;
+      padding:10px 12px;
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+      height:fit-content;
+    }
+    .tBody h3{
+      margin:2px 0 6px;
+      font-family:"Space Grotesk",Inter,sans-serif;
+      letter-spacing:-.01em;
+      font-size:16px;
+    }
+    .tBody p{ margin:0; }
+
+    /* Manifestu laburpen grafikoa */
+    .manifestWrap{ margin-top:14px; }
+    .manifestGrid{
+      display:grid;
+      grid-template-columns:repeat(12,minmax(0,1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+    .mCard{
+      grid-column:span 4;
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      background:#fafafa;
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .mCard:before{
+      content:"";
+      position:absolute; inset:0;
+      background:linear-gradient(0deg, rgba(243,228,0,.10), rgba(243,228,0,0));
+      pointer-events:none;
+    }
+    .mTop{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .mLabel{
+      font-family:"IBM Plex Mono", ui-monospace, monospace;
+      font-weight:800;
+      font-size:11px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      color:rgba(0,0,0,.78);
+    }
+    .mIcon{
+      width:34px;height:34px;
+      border-radius:14px;
+      background:var(--set-yellow);
+      border:1px solid rgba(0,0,0,.10);
+      display:grid;
+      place-items:center;
+    }
+    .mIcon svg{ width:18px;height:18px; }
+    .mTitle{
+      position:relative;
+      margin:0 0 6px;
+      font-family:"Space Grotesk",Inter,sans-serif;
+      font-size:15px;
+      letter-spacing:-.01em;
+    }
+    .mText{
+      position:relative;
+      margin:0;
+      color:rgba(17,17,20,.82);
+      line-height:1.65;
+      font-weight:650;
+      font-size:13px;
+    }
+
+    .callout{
+      margin-top:14px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px;
+      border:1px solid var(--line-strong);
+      border-radius:var(--radius-lg);
+      background:#fff;
+    }
+    .callout strong{
+      font-family:"IBM Plex Mono", ui-monospace, monospace;
+      font-size:11px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+    }
+    .callout a{
+      font-family:"IBM Plex Mono", ui-monospace, monospace;
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--set-black);
+      text-decoration:none;
+      border-bottom:1px solid rgba(0,0,0,.35);
+      padding-bottom:2px;
+    }
+    .callout a:hover{ border-bottom-color:rgba(0,0,0,.70); }
+
+    /* Nodes map */
+    #nodesMap{
+      height:460px;
+      border-radius:var(--radius-xl);
+      border:1px solid var(--line);
+      overflow:hidden;
+      margin-top:14px;
+    }
+    .mapLegend{
+      margin-top:12px;
+      color:var(--muted);
+      font-weight:700;
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    /* Nodoak */
+    .nodesGrid{
+      display:grid;
+      grid-template-columns:repeat(12,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+    .node{
+      grid-column:span 4;
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      padding:14px;
+      background:#fafafa;
+    }
+    .node strong{
+      display:block;
+      font-family:"Space Grotesk",Inter,sans-serif;
+      letter-spacing:-.01em;
+      margin-bottom:6px;
+    }
+    .node p{
+      margin:0;
+      font-weight:700;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    /* 2025 block */
+    .meet2025{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap:14px;
+      border:1px solid var(--line);
+      border-radius:var(--radius-xl);
+      background:#fff;
+      overflow:hidden;
+    }
+    .meetPoster img{ width:100%; display:block; }
+    .meetPoster .cap{
+      padding:10px 12px;
+      border-top:1px solid var(--line);
+      font-family:"IBM Plex Mono", ui-monospace, monospace;
+      font-size:11px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:700;
+      background:#fafafa;
+    }
+    .meetBody{ padding:16px; }
+
+    /* Footer */
+    footer{
+      border-top:1px solid var(--line);
+      background:rgba(243,228,0,.10);
+      padding:28px 0;
+    }
+    footer .inner{
+      font-size:13px;
+      color:rgba(17,17,20,.78);
+      line-height:1.7;
+      font-weight:650;
+    }
+    footer a{
+      color:rgba(17,17,20,.92);
+      font-weight:900;
+      text-decoration:none;
+      border-bottom:1px solid rgba(17,17,20,.25);
+    }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .span-7{grid-column:span 12}
+      .span-5{grid-column:span 12}
+      .mCard{grid-column:span 6}
+      .node{grid-column:span 6}
+      .tItem{ grid-template-columns: 1fr; }
+      .meet2025{ grid-template-columns: 1fr; }
+      #nodesMap{ height:420px; }
+    }
+    @media (max-width: 620px){
+      .menu{display:none}
+      .mCard{grid-column:span 12}
+      .node{grid-column:span 12}
+      .heroCard{padding:20px}
+    }
+  </style>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+
+<body>
+  <div class="stripe">
+    <div class="container">
+      <div class="tag">Europa Hegoaldeko turistifikazioaren aurkako sarea</div>
+      <a href="#atribuzioa">Iturriak &amp; atribuzioa</a>
+    </div>
+  </div>
+
+  <header>
+    <div class="container">
+      <div class="nav">
+        <div class="brand">
+          <div class="badge">SET</div>
+          <div class="brand-title">
+            <strong>SET sarea</strong>
+            <span>Turistifikazioaren aurkako hirien sarea</span>
+          </div>
+        </div>
+
+        <div class="menu">
+          <a href="#zer-da">Zer da</a>
+          <a href="#ideiak">Ideiak</a>
+          <a href="#garaiak">Garaiak</a>
+          <a href="#manifestua">Manifestua</a>
+          <a href="#nodoak">Nodoak</a>
+          <a href="#topaketak">Topaketak</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="grid12">
+        <div class="span-7">
+          <div class="heroCard">
+            <div class="kicker"><span class="dot"></span> Europa Hegoaldea turistifikazioaren aurka</div>
+            <h1>Turistifikazioaren aurrean dauden hirien sarea</h1>
+            <p class="lead">
+              SET sarea Europa Hegoaldeko kolektibo, elkarte eta gizarte-mugimenduen arteko sarea da,
+              turismoaren ondorio sozial, ekonomiko eta ekologikoei aurre egiteko.
+            </p>
+
+            <div class="actions">
+              <a class="btn primary" href="#zer-da">Hasi irakurtzen</a>
+              <a class="btn ghost" href="https://bizilagunekin.eus/eu/set-sarea/" target="_blank" rel="noreferrer">Manifestu fundazionala</a>
+              <a class="btn ghost" href="#topaketak">Topaketak</a>
+              <a class="btn ghost" href="https://eu.wikipedia.org/wiki/SET_sarea" target="_blank" rel="noreferrer">Wikipedian</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="span-5">
+          <div class="heroSide">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/SET_logo_%28Basque%29.png" alt="SET sarearen logoa">
+            <div class="cap">Irudia: Wikimedia Commons</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <div class="container">
+      <div class="grid12">
+        <section class="section span-12" id="zer-da">
+          <div class="sectionHead">
+            <h2>Zer da SET sarea?</h2>
+            <div class="meta">Definizioa</div>
+          </div>
+          <p>
+            2018an sare gisa antolatutako ekimena: Europa Hegoaldeko hainbat hiritan turistifikazioak eragiten dituen
+            desorekak salatu, eta hiriaren/etxebizitzaren eskubidea, justizia soziala eta trantsizio ekologikoa
+            erdigunean jartzeko.
+          </p>
+        </section>
+
+        <!-- Ideiak eta aldarrikapen nagusiak (Wikipediatik, literalki) -->
+        <section class="section span-12" id="ideiak">
+          <div class="sectionHead">
+            <h2>Ideiak eta aldarrikapen nagusiak</h2>
+            <div class="meta">Wikipediatik</div>
+          </div>
+
+          <p>
+            Honako hauek dira SET sarearen ideiak eta aldarrikapen nagusiak:
+          </p>
+
+          <ul class="bullets">
+            <li><strong>Turistifikazioaren kritika:</strong> Industria turistikoak auzo eta hiriak merkantzia bihurtzen dituela, tokiko biztanleria lekualdatzen duela, etxebizitzaren prezioak garestitzen dituela eta ehun sozial eta kulturala hondatzen duela salatzen dute.</li>
+            <li><strong>Hirirako eta etxebizitzarako eskubidearen defentsa:</strong> Turismoarekin lotutako higiezinen espekulazioa gelditzea, alokairu turistikoa arautzea eta bizilagunentzako etxebizitza eskubidea bermatzea eskatzen dute.</li>
+            <li><strong>Ekonomia dibertsifikatua:</strong> Turismoaren monokultiboarekiko dependentziaren aurka daude, eta tokiko beharrak kontuan hartzen dituzten, orekatuak eta inklusiboak diren eredu ekonomikoen alde egiten dute.</li>
+            <li><strong>Justizia soziala eta ingurumenekoa:</strong> Turismoaren ingurumen-inpaktuak nabarmentzen dituzte (aztarna ekologikoaren hazkundea, ekosistemen narriadura, baliabideen kontsumoaren igoera), eta krisi klimatikoaren aurrean ingurumenaren babesa, elikadura-subiranotasuna eta erresilientzia lehenesten duten politikak aldarrikatzen dituzte.</li>
+            <li><strong>Autoantolaketa eta nazioarteko elkartasuna:</strong> Hegoaldeko Europako hirien arteko elkarlan sareak sustatzen dituzte, esperientziak eta estrategiak partekatzeko, alternatibak oinarritik eraikitzeko eta tokiko komunitateen ahalduntzea indartzeko.</li>
+          </ul>
+
+          <div class="callout">
+            <div>
+              <strong>Iturria</strong>
+              <div style="color:var(--muted); font-weight:700; margin-top:6px; font-size:13px;">
+                Testua CC BY-SA lizentziarekin: euskarazko Wikipedia.
+              </div>
+            </div>
+            <a href="https://eu.wikipedia.org/wiki/SET_sarea#Ideiak_eta_aldarrikapen_nagusiak" target="_blank" rel="noreferrer">Ikusi Wikipedian</a>
+          </div>
+        </section>
+
+        <!-- Garai nagusiak (3 aldi) -->
+        <section class="section span-12" id="garaiak">
+          <div class="sectionHead">
+            <h2>Garai nagusiak</h2>
+            <div class="meta">Hiru aldi azpimarragarri</div>
+          </div>
+
+          <p>
+            SET sareak bere jarduera areagotu du zenbait unetan, iritzi publikoan turistifikazioaren inguruko eztabaida indartuz eta hauspotuz. Hiru aldi azpimarragarri daude:
+          </p>
+
+          <div class="timeline" role="list">
+            <div class="tItem" role="listitem">
+              <div class="tBadge">2017–2018</div>
+              <div class="tBody">
+                <h3>Harremanak ehundu eta sarea sortu</h3>
+                <p>Turismo-jardueraren gorakadaren eta turistifikazioaren ondorio kaltegarrien aurrean, Europa Hegoaldeko hainbat herritan protesta-plataformak eta elkarteak sortu ziren. Harremanak ehuntzen hasi ziren, eta SET sarea sortu zen.</p>
+              </div>
+            </div>
+
+            <div class="tItem" role="listitem">
+              <div class="tBadge">2020–2021</div>
+              <div class="tBody">
+                <h3>Pandemiaren kolpea eta eredua kolokan</h3>
+                <p>COVID-19 pandemiak turismoaren gaineko ekonomi eredua kolokan jarri zuen, eta SET sareak egoera hori baliatu zuen sektorearen ahulezia salatzeko.</p>
+              </div>
+            </div>
+
+            <div class="tItem" role="listitem">
+              <div class="tBadge">2024–2025</div>
+              <div class="tBody">
+                <h3>Mobilizazioen jauzia</h3>
+                <p>2024an mobilizazioetan jauzi kualitatibo eta kuantitatibo bat eman zen, inoizko parte-hartze zabalena eta anitzena izanik. Kanariar Uharteetan hasi eta Mallorcan, Bartzelonan, Kantabrian, Donostian, Alacanten, Menorcan, Cadizen eta Granadan jarraipena izan zuten.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout">
+            <div>
+              <strong>Iturria</strong>
+              <div style="color:var(--muted); font-weight:700; margin-top:6px; font-size:13px;">
+                Garai nagusiak: euskarazko Wikipedia (CC BY-SA).
+              </div>
+            </div>
+            <a href="https://eu.wikipedia.org/wiki/SET_sarea#Garai_nagusiak" target="_blank" rel="noreferrer">Ikusi Wikipedian</a>
+          </div>
+        </section>
+
+        <section class="section span-12" id="manifestua">
+          <div class="sectionHead">
+            <h2>Manifestu fundazionala</h2>
+            <div class="meta">Laburpen grafikoa</div>
+          </div>
+
+          <p>
+            Hona hemen manifestuaren ideia nagusiak modu bisual eta sintetikoan. (Testu osoa estekan.)
+          </p>
+
+          <div class="manifestWrap">
+            <div class="manifestGrid">
+
+              <div class="mCard">
+                <div class="mTop">
+                  <div class="mLabel">1/6</div>
+                  <div class="mIcon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z" stroke="#0B0B0D" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <h3 class="mTitle">Etxebizitza eskubidea</h3>
+                <p class="mText">Bizilagunen kanporaketa, prezioen igoera eta auzoen “merkantilizazioa” salatu.</p>
+              </div>
+
+              <div class="mCard">
+                <div class="mTop">
+                  <div class="mLabel">2/6</div>
+                  <div class="mIcon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 21s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12Z" stroke="#0B0B0D" stroke-width="2" stroke-linejoin="round"/>
+                      <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="#0B0B0D" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+                <h3 class="mTitle">Hiria komunitate gisa</h3>
+                <p class="mText">Auzo-bizitza, tokiko ekonomia eta zaintza-sareak lehenetsi, ez “kontsumo-eszenatoki” gisa.</p>
+              </div>
+
+              <div class="mCard">
+                <div class="mTop">
+                  <div class="mLabel">3/6</div>
+                  <div class="mIcon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 9v4" stroke="#0B0B0D" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M12 17h.01" stroke="#0B0B0D" stroke-width="3" stroke-linecap="round"/>
+                      <path d="M10.3 4.4 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.4a2 2 0 0 0-3.4 0Z" stroke="#0B0B0D" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <h3 class="mTitle">Turismo-monokultiboaren kritika</h3>
+                <p class="mText">Mendekotasun ekonomikoa, lan-prekarietatea eta “hazkunde infinituaren” logika problematizatu.</p>
+              </div>
+
+              <div class="mCard">
+                <div class="mTop">
+                  <div class="mLabel">4/6</div>
+                  <div class="mIcon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M20 4s-8 1-12 5-5 12-5 12 8-1 12-5 5-12 5-12Z" stroke="#0B0B0D" stroke-width="2" stroke-linejoin="round"/>
+                      <path d="M9 15c1-2 3-4 6-6" stroke="#0B0B0D" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <h3 class="mTitle">Trantsizio ekologikoa</h3>
+                <p class="mText">Ingurumen-inpaktua eta baliabideen presioa murriztu: eredu jasangarriak eta erresilienteak.</p>
+              </div>
+
+              <div class="mCard">
+                <div class="mTop">
+                  <div class="mLabel">5/6</div>
+                  <div class="mIcon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 3v18" stroke="#0B0B0D" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M6 7h12" stroke="#0B0B0D" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M7 7 4 13h6L7 7Z" stroke="#0B0B0D" stroke-width="2" stroke-linejoin="round"/>
+                      <path d="M17 7 14 13h6l-3-6Z" stroke="#0B0B0D" stroke-width="2" stroke-linejoin="round"/>
+                      <path d="M8 21h8" stroke="#0B0B0D" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <h3 class="mTitle">Justizia soziala</h3>
+                <p class="mText">Ondorioak ez dira neutroak: klase-arrakala, desberdintasunak eta eskubideen urraketa erdigunean.</p>
+              </div>
+
+              <div class="mCard">
+                <div class="mTop">
+                  <div class="mLabel">6/6</div>
+                  <div class="mIcon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="#0B0B0D" stroke-width="2"/>
+                      <path d="M5 23a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="#0B0B0D" stroke-width="2"/>
+                      <path d="M19 23a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="#0B0B0D" stroke-width="2"/>
+                      <path d="M10.5 6.5 6.8 16.2" stroke="#0B0B0D" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M13.5 6.5 17.2 16.2" stroke="#0B0B0D" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M7.8 18h8.4" stroke="#0B0B0D" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <h3 class="mTitle">Sare-lana eta ekintza</h3>
+                <p class="mText">Hirien arteko koordinazioa, autoantolaketa eta presio soziala: ikusgarritasuna + alternatibak.</p>
+              </div>
+
+            </div>
+
+            <div class="callout">
+              <div>
+                <strong>Manifestua (testu osoa)</strong>
+                <div style="color:var(--muted); font-weight:700; margin-top:6px; font-size:13px;">
+                  Ideia nagusiak testu osoarekin osatzeko.
+                </div>
+              </div>
+              <a href="https://bizilagunekin.eus/eu/set-sarea/" target="_blank" rel="noreferrer">Ireki manifestua</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="section span-12" id="nodoak">
+          <div class="sectionHead">
+            <h2>Kideak eta nodoak</h2>
+            <div class="meta">Sarea</div>
+          </div>
+
+          <div class="callout" style="margin-top:0;">
+            <div>
+              <strong>Nodoen mapa</strong>
+              <div style="color:var(--muted); font-weight:700; margin-top:6px; font-size:13px;">
+                Markagailuak nodo nagusien kokapen orientagarriak dira (hiri/eskualde mailan).
+              </div>
+            </div>
+            <a href="https://eu.wikipedia.org/wiki/SET_sarea#Kideak_eta_nodoak" target="_blank" rel="noreferrer">Iturria (Wikipedia)</a>
+          </div>
+
+          <div id="nodesMap" aria-label="SET sareko nodoen mapa"></div>
+          <div class="mapLegend">Mapak OpenStreetMap/Leaflet erabiltzen du; konexioa behar du maparen teselak kargatzeko.</div>
+
+          <div class="nodesGrid">
+            <div class="node"><strong>Bartzelona</strong><p><a href="https://assembleabarris.wordpress.com/" target="_blank" rel="noreferrer">Assemblea de Barris pel Decreixement Turístic</a></p></div>
+            <div class="node"><strong>Bergamo</strong><p>Nodoa</p></div>
+            <div class="node"><strong>Bologna</strong><p>Nodoa</p></div>
+            <div class="node"><strong>Donostia</strong><p><a href="https://bizilagunekin.eus/" target="_blank" rel="noreferrer">Bizilagunekin</a></p></div>
+            <div class="node"><strong>Eivissa</strong><p>Canviem el rumb</p></div>
+            <div class="node"><strong>Cagliari</strong><p>Casa del Popolo Rosa Luxemburg</p></div>
+            <div class="node"><strong>Kanariak</strong><p>Nodoa</p></div>
+            <div class="node"><strong>Kantabria</strong><p><a href="https://cantabrianosevende.org/" target="_blank" rel="noreferrer">Cantabria No Se Vende</a></p></div>
+            <div class="node"><strong>Kordoba</strong><p>SET Córdoba</p></div>
+            <div class="node"><strong>Florentzia</strong><p>SET Firenze</p></div>
+            <div class="node"><strong>Formentera</strong><p>Canviem el rumb</p></div>
+            <div class="node"><strong>Genova</strong><p><a href="https://autaut357.noblogs.org/" target="_blank" rel="noreferrer">Aut Aut 357</a></p></div>
+            <div class="node"><strong>Granada</strong><p>Albayzín Habitable</p></div>
+            <div class="node"><strong>Lisboa</strong><p><a href="https://moraremlisboa.org/" target="_blank" rel="noreferrer">Morar em Lisboa</a></p></div>
+            <div class="node"><strong>Mallorca</strong><p><a href="https://menysturisme.wordpress.com/" target="_blank" rel="noreferrer">Menys Turisme, Més Vida</a></p></div>
+            <div class="node"><strong>Menorca</strong><p>Associació de Vesines des Mercadal</p></div>
+            <div class="node"><strong>Napoli</strong><p><a href="https://restabitante.org/" target="_blank" rel="noreferrer">Resta Abitante</a></p></div>
+            <div class="node"><strong>Rimini</strong><p>Nodoa</p></div>
+            <div class="node"><strong>Palermo</strong><p>APRO</p></div>
+            <div class="node"><strong>Pirinioak</strong><p>Pirineu Viu</p></div>
+            <div class="node"><strong>Tarragona</strong><p><a href="https://www.stopcreuers.cat/" target="_blank" rel="noreferrer">Stop Creuers Tarragona</a></p></div>
+            <div class="node"><strong>Valentzia</strong><p>Nodoa</p></div>
+            <div class="node"><strong>Venezia</strong><p><a href="https://ocio-venezia.it/" target="_blank" rel="noreferrer">Ocio</a></p></div>
+          </div>
+        </section>
+
+        <!-- Topaketa presentzialak -->
+        <section class="section span-12" id="topaketak">
+          <div class="sectionHead">
+            <h2>Topaketa presentzialak</h2>
+            <div class="meta">Zerrenda</div>
+          </div>
+
+          <ul class="bullets">
+            <li>2018ko maiatzaren 18-19a, Bartzelona: II. Fòrum Veïnal sobre Turisme – SET sarearen lehen topaketa</li>
+            <li>2018ko urria, Napoli: SET Italiako nodoen topaketa</li>
+            <li>2019ko martxoaren 1-3a, Florentzia: RE-SET Italiako nodoen topaketa</li>
+            <li>2019ko apirilaren 2-7a, Sevilla: ESTAR – Turistifikazioaren aurkako gizarte-topaketa, SET sarearen bigarren topaketa barne</li>
+            <li><strong>2025eko apirilaren 25-27a, Bartzelona: SET Topaketa</strong> — <a href="https://assembleabarris.wordpress.com/trobadaset2025/" target="_blank" rel="noreferrer">TROBADA SET 2025</a></li>
+          </ul>
+
+          <div class="meet2025">
+            <div class="meetPoster">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Cartell-cimera.webp/500px-Cartell-cimera.webp.png" alt="Cartell Trobada Sud d’Europa contra la Turistització 2025">
+              <div class="cap">Cartell: Wikimedia Commons</div>
+            </div>
+
+            <div class="meetBody">
+              <div class="kicker" style="margin-bottom:10px;"><span class="dot"></span> 25–27 apirila 2025 • Bartzelona</div>
+              <h3 style="margin:0 0 10px; font-family:'Space Grotesk',Inter,sans-serif; letter-spacing:-.01em;">
+                SET Topaketa 2025 (Trobada Sud d’Europa contra la Turistització)
+              </h3>
+              <p style="margin:0; color:rgba(17,17,20,.85); line-height:1.75; font-weight:650; font-size:14px;">
+                Jardunaldi irekiak: mahai-ingurua, tailerrak (habitatgea, mugikortasuna, lana, krisi ekologikoa…), eta amaieran mobilizazio sinbolikoa.
+              </p>
+
+              <div class="actions" style="margin-top:14px;">
+                <a class="btn primary" href="https://assembleabarris.wordpress.com/trobadaset2025/" target="_blank" rel="noreferrer">Info + Programa</a>
+                <a class="btn ghost" href="https://eu.wikipedia.org/wiki/SET_sarea#Topaketa_presentzialak" target="_blank" rel="noreferrer">Iturria (Wikipedia)</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section span-12" id="atribuzioa">
+          <div class="sectionHead">
+            <h2>Iturriak eta atribuzioa</h2>
+            <div class="meta">CC BY-SA</div>
+          </div>
+          <p>
+            Edukiaren oinarri informatiboa: <a href="https://eu.wikipedia.org/wiki/SET_sarea" target="_blank" rel="noreferrer">SET sarea — euskarazko Wikipedia</a>.
+            Irudiak: Wikimedia Commons (logo).
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="inner">
+        Edukia oinarrituta: <a href="https://eu.wikipedia.org/wiki/SET_sarea" target="_blank" rel="noreferrer">SET sarea – euskarazko Wikipedia</a> (CC BY-SA 4.0).<br>
+        Orrialde hau diseinu-proposamen independente bat da.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      const mapEl = document.getElementById('nodesMap');
+      if(!mapEl || !window.L) return;
+
+      const map = L.map('nodesMap', { scrollWheelZoom: false });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      const nodes = [
+        {name:'Bartzelona', lat:41.3851, lon:2.1734},
+        {name:'Bergamo', lat:45.6983, lon:9.6773},
+        {name:'Bologna', lat:44.4949, lon:11.3426},
+        {name:'Donostia', lat:43.3183, lon:-1.9812},
+        {name:'Eivissa', lat:38.9067, lon:1.4206},
+        {name:'Cagliari', lat:39.2238, lon:9.1217},
+        {name:'Kanariak', lat:28.1235, lon:-15.4363},
+        {name:'Kantabria', lat:43.4623, lon:-3.80998},
+        {name:'Kordoba', lat:37.8882, lon:-4.7794},
+        {name:'Florentzia', lat:43.7696, lon:11.2558},
+        {name:'Formentera', lat:38.7057, lon:1.4283},
+        {name:'Genova', lat:44.4056, lon:8.9463},
+        {name:'Granada', lat:37.1773, lon:-3.5986},
+        {name:'Lisboa', lat:38.7223, lon:-9.1393},
+        {name:'Mallorca', lat:39.5696, lon:2.6502},
+        {name:'Menorca', lat:39.8886, lon:4.2658},
+        {name:'Napoli', lat:40.8518, lon:14.2681},
+        {name:'Rimini', lat:44.0678, lon:12.5695},
+        {name:'Palermo', lat:38.1157, lon:13.3615},
+        {name:'Pirinioak', lat:42.1362, lon:-0.4087},
+        {name:'Tarragona', lat:41.1189, lon:1.2445},
+        {name:'Valentzia', lat:39.4699, lon:-0.3763},
+        {name:'Venezia', lat:45.4408, lon:12.3155}
+      ];
+
+      const bounds = [];
+      nodes.forEach(n => {
+        const m = L.marker([n.lat, n.lon]).addTo(map);
+        m.bindPopup('<strong>' + n.name + '</strong>');
+        bounds.push([n.lat, n.lon]);
+      });
+
+      map.fitBounds(bounds, { padding: [18, 18] });
+
+      // Allow zoom on click/focus
+      mapEl.addEventListener('click', () => map.scrollWheelZoom.enable(), { once:true });
+      mapEl.addEventListener('focus', () => map.scrollWheelZoom.enable(), { once:true });
+    })();
+  </script>
+</body>
+</html>
+
+
